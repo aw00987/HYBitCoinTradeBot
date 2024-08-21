@@ -39,6 +39,37 @@ def get_market_data(symbol="BTC-USDT", bar="1m", limit=100):
         return None
 
 
+def plot(df):
+
+    # 假设已经准备好了DataFrame df，其中包括 'timestamp', 'close', 'DEMA', 'Signal'
+
+    # 创建图形
+    plt.figure(figsize=(14, 7))
+
+    # 画出市值和DEMA折线图
+    plt.plot(df['timestamp'], df['close'], label='Market Value (Close)', color='blue', linewidth=2)
+    plt.plot(df['timestamp'], df['DEMA'], label='DEMA', color='orange', linewidth=2)
+
+    # 标记买点和卖点
+    buy_signals = df[df['Signal'] == 1]
+    sell_signals = df[df['Signal'] == -1]
+
+    plt.plot(buy_signals['timestamp'], buy_signals['close'], '^', markersize=10, color='green', label='Buy Signal')
+    plt.plot(sell_signals['timestamp'], sell_signals['close'], 'v', markersize=10, color='red', label='Sell Signal')
+
+    # 添加标题和标签
+    plt.title('Market Value and DEMA with Buy/Sell Signals')
+    plt.xlabel('Timestamp')
+    plt.ylabel('Value')
+    plt.xticks(rotation=45)  # 使时间戳标签倾斜以防重叠
+    plt.legend()
+
+    # 显示图形
+    plt.grid(True)
+    plt.show()
+
+
+
 def main():
     # 拉取市场数据
     df = get_market_data("BTC-USDT", "1m", 200)
@@ -62,8 +93,8 @@ def main():
     df['f_double_prime'] = df['f_prime'].diff()  # 二阶差分
 
     # 定义阈值
-    zero_threshold = 50  # f接近0的阈值
-    second_derivative_threshold = 5  # f''合理范围的阈值
+    zero_threshold = 10  # f接近0的阈值
+    second_derivative_threshold = 1  # f''合理范围的阈值
 
     # 初始化信号列
     df['Signal'] = 0
@@ -95,6 +126,8 @@ def main():
         if row['Signal'] == -1:
             print(row.tolist())
 
+    plot(df)
 
 if __name__ == "__main__":
     main()
+
