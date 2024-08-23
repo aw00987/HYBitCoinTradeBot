@@ -22,3 +22,4 @@ def calculate_signal(df, zero_threshold, second_derivative_threshold):
         (df['f_double_prime'] < second_derivative_threshold),
         'Signal'
     ] = -1  # -1表示卖出信号
+

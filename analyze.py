@@ -1,6 +1,6 @@
-from calculator import calculate_signal
-from oks_api import get_market_data
-from viewer import terminal_output, plot
+from calculator import *
+from oks_api import *
+from viewer import *
 
 SYMBOL = "BTC-USDT"
 BAR = "1m"
