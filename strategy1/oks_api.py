@@ -39,7 +39,7 @@ def get_market_data(symbol, bar, limit):
 
         df = df.iloc[::-1].loc[:, ["timestamp", "close"]]
 
-        df['timestamp'] = pd.to_datetime(pd.to_numeric(df['timestamp']), unit='ms')
+        # df['timestamp'] =  pd.to_datetime(pd.to_numeric(df['timestamp']), unit='ms')
 
         df[['close']] = df[['close']].astype(float)
 

@@ -12,12 +12,13 @@ LIMIT = 100
 ZERO_THRESHOLD = 10  # f接近0的阈值
 SECOND_DERIVATIVE_THRESHOLD = 1  # f''合理范围的阈值
 
-ani = None  # 声明全局变量
+ANI = None  # 声明全局变量
+
 
 def get_data():
     df = get_market_data(SYMBOL, BAR, LIMIT)
     calculate_signal(df, ZERO_THRESHOLD, SECOND_DERIVATIVE_THRESHOLD)
-    df['timestamp'] = mdates.date2num(df['timestamp'])
+    # df['timestamp'] = mdates.date2num(df['timestamp'])
     return df
 
 
@@ -81,14 +82,14 @@ def animate(df):
 
     # 创建动画，设置interval为60000毫秒(1分钟)
     ani = FuncAnimation(
-        fig, update_plot, fargs=(df, line1, line2, scatter_buy, scatter_sell), interval=60000,cache_frame_data=False
+        fig, update_plot, fargs=(df, line1, line2, scatter_buy, scatter_sell), interval=60000, cache_frame_data=False
     )
 
     # 显示图形
     plt.show()
 
+    return ani
+
 
 if __name__ == "__main__":
-    # 初始化数据
-    initial_data = get_data()
-    animate(initial_data)
+    ANI = animate(get_data())
