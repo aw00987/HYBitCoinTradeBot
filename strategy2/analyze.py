@@ -21,8 +21,8 @@ def get_data():
     df_tema['timestamp'] = pd.to_datetime(df_tema['timestamp'], unit='ms')
     df_alligator['timestamp'] = pd.to_datetime(df_alligator['timestamp'], unit='ms')
 
-    print(df_tema)
-    print(df_alligator)
+    # print(df_tema)
+    # print(df_alligator)
 
     return df_tema, df_alligator
 
@@ -85,18 +85,21 @@ def plot():
     ax.legend()
 
     # Create the animation, updating every minute (60000 milliseconds)
-    ani = animation.FuncAnimation(
-        fig, update_plot, fargs=(ax, line_market, line_tema, line_jaw, line_teeth, line_lips, buy_scatter,
-                                 sell_scatter), interval=60000, blit=False, cache_frame_data=False
-    )
+    ani = animation.FuncAnimation(fig,
+                                  func=update_plot,
+                                  fargs=(ax, line_market, line_tema, line_jaw, line_teeth, line_lips, buy_scatter,
+                                         sell_scatter),
+                                  interval=20000, blit=False, cache_frame_data=False
+                                  )
 
     # Show plot
+
     plt.show()
 
+    return ani
 
-def main():
-    plot()
 
+ANI = None
 
 if __name__ == "__main__":
-    main()
+    ANI = plot()
