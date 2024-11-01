@@ -1,7 +1,9 @@
-from calculator import *
-from oks_api import *
 import matplotlib.animation as animation
 import matplotlib.pyplot as plt
+
+from calculator import *
+from oks_api import *
+import numpy as np
 
 SYMBOL = "BTC-USDT"
 TEMA_BAR = "1D"
@@ -20,9 +22,6 @@ def get_data():
 
     df_tema['timestamp'] = pd.to_datetime(df_tema['timestamp'], unit='ms')
     df_alligator['timestamp'] = pd.to_datetime(df_alligator['timestamp'], unit='ms')
-
-    print(df_tema)
-    print(df_alligator)
 
     return df_tema, df_alligator
 
@@ -43,8 +42,15 @@ def update_plot(frame, ax, line_market, line_tema, line_jaw, line_teeth, line_li
     # Update the data for buy and sell points
     buy_signals = df_tema[df_tema['Signal'] == 1]
     sell_signals = df_tema[df_tema['Signal'] == -1]
-    buy_scatter.set_offsets(list(zip(buy_signals['timestamp'], buy_signals['close'])))
-    sell_scatter.set_offsets(list(zip(sell_signals['timestamp'], sell_signals['close'])))
+
+    if not buy_signals.empty:
+        buy_scatter.set_offsets(np.column_stack((buy_signals['timestamp'], buy_signals['close'])))
+    else:
+        buy_scatter.set_offsets(np.empty((0, 2)))
+    if not sell_signals.empty:
+        sell_scatter.set_offsets(np.column_stack((sell_signals['timestamp'], sell_signals['close'])))
+    else:
+        sell_scatter.set_offsets(np.empty((0, 2)))
 
     # Set the x and y limits dynamically
     ax.set_xlim(df_tema['timestamp'].min(), df_tema['timestamp'].max())
@@ -57,16 +63,6 @@ def update_plot(frame, ax, line_market, line_tema, line_jaw, line_teeth, line_li
 
 
 def plot():
-    '''
-    Output animated line chart with marked buy and sell points, refreshing every minute.
-    Data is generated through the data_callback function.
-
-    :param data_callback: A callback function that generates/returns two DataFrames: df_tema and df_alligator.
-                          df_tema: ['timestamp', 'close', 'TEMA', 'Signal']
-                          df_alligator: ['timestamp', 'jaw', 'teeth', 'lips']
-    :return: None
-    '''
-
     # Create a figure and axis
     fig, ax = plt.subplots(figsize=(14, 7))
 
@@ -87,7 +83,8 @@ def plot():
     # Create the animation, updating every minute (60000 milliseconds)
     ani = animation.FuncAnimation(
         fig, update_plot, fargs=(ax, line_market, line_tema, line_jaw, line_teeth, line_lips, buy_scatter,
-                                 sell_scatter), interval=60000, blit=False, cache_frame_data=False
+                                 sell_scatter),
+        repeat_delay=0, frames=1, interval=10000, blit=False, cache_frame_data=False
     )
 
     # Show plot
