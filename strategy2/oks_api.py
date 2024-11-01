@@ -11,6 +11,10 @@ API_KEY = 'your_api_key'
 API_SECRET = 'your_api_secret'
 API_PASSPHRASE = 'your_api_passphrase'
 
+proxies = {
+    "http": "http://127.0.0.1:7897",
+    "https": "http://127.0.0.1:7897",
+}
 
 def get_market_data(symbol, bar, limit):
     """
@@ -27,7 +31,7 @@ def get_market_data(symbol, bar, limit):
         "bar": bar,
         "limit": limit
     }
-    response = requests.get(url, params)
+    response = requests.get(url, params,proxies=proxies)# todo：注意非中国网络环境需要去除proxies参数，别忘了删除逗号
 
     data = response.json()
 
