@@ -1,4 +1,3 @@
-import matplotlib.dates as mdates
 import numpy as np
 from matplotlib.animation import FuncAnimation
 
