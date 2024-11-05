@@ -49,7 +49,7 @@ def update_plot(frame, ax, line_market, line_tema, line_jaw, line_teeth, line_li
     sell_signals = df_tema[df_tema['Signal'] == -1]
 
     if not buy_signals.empty:
-        sell_scatter.set_offsets(np.column_stack((buy_signals['timestamp'].astype(object), buy_signals['close'].astype(object))))
+        buy_scatter.set_offsets(np.column_stack((buy_signals['timestamp'].astype(object), buy_signals['close'].astype(object))))
     else:
         buy_scatter.set_offsets(np.empty((0, 2)))
     if not sell_signals.empty:
