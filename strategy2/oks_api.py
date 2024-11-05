@@ -16,6 +16,7 @@ proxies = {
     "https": "http://127.0.0.1:7897",
 }
 
+
 def get_market_data(symbol, bar, limit):
     """
     获取市场数据
@@ -31,7 +32,9 @@ def get_market_data(symbol, bar, limit):
         "bar": bar,
         "limit": limit
     }
-    response = requests.get(url, params,proxies=proxies)# todo：注意非中国网络环境需要去除proxies参数，别忘了删除逗号
+    response = requests.get(url, params
+                            # ,proxies=proxies # 中国网络环境需要加入proxies参数
+    )
 
     data = response.json()
 

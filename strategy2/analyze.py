@@ -1,16 +1,18 @@
 import matplotlib.animation as animation
 import matplotlib.pyplot as plt
+import warnings
+
 
 from calculator import *
 from oks_api import *
 import numpy as np
 
 SYMBOL = "BTC-USDT"
-TEMA_BAR = "1D"
+TEMA_BAR = "1H"
 ALLIGATOR_BAR = "1H"
 LIMIT = 200
-ZERO_THRESHOLD = 10
-SECOND_DERIVATIVE_THRESHOLD = 2
+ZERO_THRESHOLD = 20
+SECOND_DERIVATIVE_THRESHOLD = 4
 
 
 def get_data():
@@ -29,6 +31,9 @@ def get_data():
 # Function to update the plot
 def update_plot(frame, ax, line_market, line_tema, line_jaw, line_teeth, line_lips, buy_scatter,
                 sell_scatter):
+
+    print("frame updated once")
+
     # Call the data callback to get updated data
     df_tema, df_alligator = get_data()
 
@@ -44,11 +49,11 @@ def update_plot(frame, ax, line_market, line_tema, line_jaw, line_teeth, line_li
     sell_signals = df_tema[df_tema['Signal'] == -1]
 
     if not buy_signals.empty:
-        buy_scatter.set_offsets(np.column_stack((buy_signals['timestamp'], buy_signals['close'])))
+        sell_scatter.set_offsets(np.column_stack((buy_signals['timestamp'].astype(object), buy_signals['close'].astype(object))))
     else:
         buy_scatter.set_offsets(np.empty((0, 2)))
     if not sell_signals.empty:
-        sell_scatter.set_offsets(np.column_stack((sell_signals['timestamp'], sell_signals['close'])))
+        sell_scatter.set_offsets(np.column_stack((sell_signals['timestamp'].astype(object), sell_signals['close'].astype(object))))
     else:
         sell_scatter.set_offsets(np.empty((0, 2)))
 
@@ -96,4 +101,5 @@ def main():
 
 
 if __name__ == "__main__":
+    warnings.simplefilter(action='ignore', category=FutureWarning)
     main()
