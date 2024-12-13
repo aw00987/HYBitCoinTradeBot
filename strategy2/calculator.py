@@ -1,24 +1,54 @@
 import talib
 
-def calculate_tema_signal(df, zero_threshold, second_derivative_threshold):
-    df["TEMA"] = talib.TEMA(df["close"], 20)
-    df['f'] = df['TEMA'] - df['close']
-    df['f_prime'] = df['f'].diff()
-    df['f_double_prime'] = df['f_prime'].diff()
+# def calculate_tema_signal(df, zero_threshold, second_derivative_threshold):
+#     df["TEMA"] = talib.TEMA(df["close"], 20)
+#     df['f'] = df['TEMA'] - df['close']
+#     df['f_prime'] = df['f'].diff()
+#     df['f_double_prime'] = df['f_prime'].diff()
+#
+#     # Initialize Signal column
+#     df['Signal'] = 0
+#     # Buy Signal: f close to 0, f' < 0, and f'' within a reasonable range
+#     df.loc[
+#         (abs(df['f']) <= zero_threshold) & (df['f_prime'] < 0) & (df['f_double_prime'] > -second_derivative_threshold),
+#         'Signal'
+#     ] = 1
+#     # Sell Signal: f close to 0, f' > 0, and f'' within a reasonable range
+#     df.loc[
+#         (abs(df['f']) <= zero_threshold) & (df['f_prime'] > 0) & (df['f_double_prime'] < second_derivative_threshold),
+#         'Signal'
+#     ] = -1
 
-    # Initialize Signal column
-    df['Signal'] = 0
-    # Buy Signal: f close to 0, f' < 0, and f'' within a reasonable range
-    df.loc[
-        (abs(df['f']) <= zero_threshold) & (df['f_prime'] < 0) & (df['f_double_prime'] > -second_derivative_threshold),
-        'Signal'
-    ] = 1
-    # Sell Signal: f close to 0, f' > 0, and f'' within a reasonable range
-    df.loc[
-        (abs(df['f']) <= zero_threshold) & (df['f_prime'] > 0) & (df['f_double_prime'] < second_derivative_threshold),
-        'Signal'
-    ] = -1
 
+def filter_frequent_signal(df):
+    # 避免频繁交易 用相对价格变化率（百分比）过滤。例如只有当市值相对上次交易价格涨跌超过1%时才执行新交易。
+
+    threshold_rate = 0.01  # 比如1%的价格变化率阈值
+    last_trade_price = None
+
+    for i, row in df.iterrows():
+        sig = row['Signal']
+        price = row['close']
+
+        if sig != 0:  # 有买入(1)或卖出(-1)信号
+            if last_trade_price is None:
+                # 第一次产生信号，直接执行并记住这个价格
+                last_trade_price = price
+            else:
+                # 计算相对价格变化率
+                change_rate = abs(price - last_trade_price) / last_trade_price
+                if change_rate < threshold_rate:
+                    # 未达到阈值要求，将此信号过滤掉（变为0）
+                    df.at[i, 'Signal'] = 0
+                else:
+                    # 达到阈值，更新last_trade_price
+                    last_trade_price = price
+        else:
+            # signal == 0，无需修改
+            pass
+
+
+def filter_same_signal(df):
     # 去除相同的重复信号
 
     # 提前确保signal列为int类型（或至少是可比较类型）

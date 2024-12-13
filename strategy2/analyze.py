@@ -2,6 +2,7 @@ import matplotlib.animation as animation
 import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
 import numpy as np
+from calculator import *
 
 from oks_api import *
 
@@ -27,6 +28,11 @@ class TradingBot:
         try:
             df_tema = get_market_data(self.symbol, self.tema_bar, self.limit)
             self.calculate_tema_signal(df_tema)
+
+            filter_same_signal(df_tema)
+            filter_frequent_signal(df_tema)
+            filter_same_signal(df_tema)
+
             df_tema['timestamp'] = pd.to_datetime(pd.to_numeric(df_tema['timestamp']), unit='ms')
             self.df_tema = df_tema
             return df_tema
@@ -175,6 +181,3 @@ class TradingBot:
 if __name__ == "__main__":
     bot = TradingBot(SYMBOL, TEMA_BAR, LIMIT)
     bot.run()
-
-    # 1. 横盘问题解决
-    # 2. 模拟盘回测
