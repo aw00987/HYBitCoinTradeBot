@@ -33,6 +33,8 @@ class TradingBot:
             filter_frequent_signal(df_tema)
             filter_same_signal(df_tema)
 
+            simulate(df_tema)
+
             df_tema['timestamp'] = pd.to_datetime(pd.to_numeric(df_tema['timestamp']), unit='ms')
             self.df_tema = df_tema
             return df_tema

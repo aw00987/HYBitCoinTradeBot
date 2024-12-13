@@ -74,6 +74,49 @@ def filter_same_signal(df):
     # 将调整后的信号回写到DataFrame
     df['Signal'] = adjusted_signals
 
+
+def simulate(df):
+
+    # 初始条件
+    wallet = 1.0  # 初始法币资金
+    btc = 0.0     # 初始BTC数量
+    started = False  # 是否已经遇到首个买入信号
+
+    for idx, row in df.iterrows():
+        close_price = row["close"]
+        signal = row["Signal"]
+
+        # 如果还没开始，只有遇到第一个买入信号才执行首次操作
+        if not started:
+            if signal == 1:
+                # 全仓买入BTC
+                btc = wallet / close_price
+                wallet = 0.0
+                started = True
+            else:
+                # 还没开始，非买入信号则不操作
+                continue
+        else:
+            # 已经开始策略
+            if signal == 1:
+                # 有法币就买入BTC，如果目前资金都在BTC中则不操作
+                if wallet > 0:
+                    btc += wallet / close_price
+                    wallet = 0.0
+            elif signal == -1:
+                # 有BTC就全部卖出换回法币，如果没有BTC则不操作
+                if btc > 0:
+                    wallet = btc * close_price
+                    btc = 0.0
+            # signal == 0: 不操作
+
+    # 遍历完成后计算最终资产
+    # 如果最后持有BTC，则将BTC全部按最后close价格转化为法币价值
+    final_asset = wallet if btc == 0 else btc * df.iloc[-1]["close"]
+
+    print("最终资产价值: ", final_asset)
+
+
 def calculate_alligator_signal(df):
     df['jaw'] = talib.SMA(df['close'], 13)
     df['teeth'] = talib.SMA(df['close'], 8)
